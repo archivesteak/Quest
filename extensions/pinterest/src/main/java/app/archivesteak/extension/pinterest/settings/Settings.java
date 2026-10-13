@@ -25,6 +25,7 @@ public final class Settings {
     // Categories. Their titles are the strings "category_<category>".
     private static final String PIN_PAGE = "pin_page";
     private static final String LONG_PRESS_MENU = "long_press_menu";
+    private static final String SHARING = "sharing";
 
     // region Pin page
 
@@ -47,6 +48,12 @@ public final class Settings {
     public static final BooleanSetting LONG_PRESS_VISUAL_SEARCH = new BooleanSetting("long_press_VISUAL_SEARCH", true, LONG_PRESS_MENU);
     public static final BooleanSetting LONG_PRESS_EDIT = new BooleanSetting("long_press_EDIT", true, LONG_PRESS_MENU);
     public static final BooleanSetting LONG_PRESS_REORDER = new BooleanSetting("long_press_REORDER", true, LONG_PRESS_MENU);
+
+    // endregion
+
+    // region Sharing
+
+    public static final BooleanSetting SHARE_WITH_ANDROID = new BooleanSetting("share_with_android", true, SHARING);
 
     // endregion
 
