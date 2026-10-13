@@ -7,6 +7,7 @@ import com.android.tools.smali.dexlib2.iface.Field
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
+import com.android.tools.smali.dexlib2.iface.value.ArrayEncodedValue
 import com.android.tools.smali.dexlib2.iface.value.StringEncodedValue
 
 /*
@@ -42,6 +43,15 @@ fun ClassDef.getterOf(field: Field): Method = methods.single { method ->
                 }
         } == true
 }
+
+/** Value type of a `Map<String, V>` field, read from its generic signature. */
+val Field.mapValueType: String
+    get() {
+        val signature = annotations.single { it.type == "Ldalvik/annotation/Signature;" }
+            .elements.single().value as ArrayEncodedValue
+        val genericType = signature.value.joinToString("") { (it as StringEncodedValue).value }
+        return Regex("^Ljava/util/Map<Ljava/lang/String;(L[^<>;]+;)>;$").find(genericType)!!.groupValues[1]
+    }
 
 /** Smali reference to [method], e.g. `Lfoo;->bar()Ljava/lang/String;`. */
 val Method.smaliReference: String

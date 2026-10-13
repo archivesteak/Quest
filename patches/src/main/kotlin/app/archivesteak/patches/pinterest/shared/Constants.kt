@@ -4,6 +4,8 @@ import app.morphe.patcher.patch.ApkFileType
 import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 
+internal const val EXTENSION_PACKAGE = "Lapp/archivesteak/extension/pinterest"
+
 object Constants {
     val COMPATIBILITY_PINTEREST = Compatibility(
         name = "Pinterest",

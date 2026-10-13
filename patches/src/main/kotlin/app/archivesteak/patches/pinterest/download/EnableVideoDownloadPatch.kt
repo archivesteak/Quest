@@ -1,10 +1,9 @@
 package app.archivesteak.patches.pinterest.download
 
 import app.archivesteak.patches.pinterest.shared.Constants.COMPATIBILITY_PINTEREST
-import app.archivesteak.patches.pinterest.shared.fieldWithJsonName
-import app.archivesteak.patches.pinterest.shared.getterOf
-import app.archivesteak.patches.pinterest.shared.modelClassWithJsonFields
-import app.archivesteak.patches.pinterest.shared.smaliReference
+import app.archivesteak.patches.pinterest.shared.EXTENSION_PACKAGE
+import app.archivesteak.patches.pinterest.shared.pinClass
+import app.archivesteak.patches.pinterest.shared.pinModelPatch
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
@@ -25,7 +24,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 
-private const val EXTENSION_CLASS = "Lapp/archivesteak/extension/pinterest/VideoDownloadPatch;"
+private const val EXTENSION_CLASS = "$EXTENSION_PACKAGE/VideoDownloadPatch;"
 
 @Suppress("unused")
 val enableVideoDownloadPatch = bytecodePatch(
@@ -36,9 +35,7 @@ val enableVideoDownloadPatch = bytecodePatch(
     compatibleWith(COMPATIBILITY_PINTEREST)
 
     // The menu row also requires the Pin to be eligible for image download.
-    dependsOn(enableImageDownloadPatch)
-
-    extendWith("extensions/pinterest.mpe")
+    dependsOn(enableImageDownloadPatch, pinModelPatch)
 
     execute {
         // region Show the download row for video Pins.
@@ -74,16 +71,6 @@ val enableVideoDownloadPatch = bytecodePatch(
 
         // region Download the video instead of the image when the row is tapped.
 
-        val pinClass = modelClassWithJsonFields(IMAGE_DOWNLOAD_ELIGIBILITY_KEY, "videos")
-        val videosGetter = pinClass.getterOf(pinClass.fieldWithJsonName("videos"))
-
-        val videoClass = classDefBy(videosGetter.returnType)
-        val videoListGetter = videoClass.getterOf(videoClass.fieldWithJsonName("video_list"))
-
-        // Values of video_list, one per encoding.
-        val videoVariantClass = modelClassWithJsonFields("url", "manifest", "captions_urls")
-        val urlGetter = videoVariantClass.getterOf(videoVariantClass.fieldWithJsonName("url"))
-
         var hookedHandlers = 0
         DownloadImageClickFingerprint.matchAll().forEach { match ->
             // The menu presenters keep the Pin the menu was opened for.
@@ -95,13 +82,7 @@ val enableVideoDownloadPatch = bytecodePatch(
                 """
                     iget-object v0, p0, ${match.originalClassDef.type}->${pinField.name}:${pinField.type}
                     if-eqz v0, :download_image
-                    invoke-virtual { v0 }, ${videosGetter.smaliReference}
-                    move-result-object v0
-                    if-eqz v0, :download_image
-                    invoke-virtual { v0 }, ${videoListGetter.smaliReference}
-                    move-result-object v0
-                    const-string v1, "${urlGetter.name}"
-                    invoke-static { p1, v0, v1 }, $EXTENSION_CLASS->downloadVideo(Landroid/content/Context;Ljava/util/Map;Ljava/lang/String;)Z
+                    invoke-static { p1, v0 }, $EXTENSION_CLASS->downloadVideo(Landroid/content/Context;Ljava/lang/Object;)Z
                     move-result v0
                     if-eqz v0, :download_image
                     return-void
