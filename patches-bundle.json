@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-13T18:50:19",
-  "description": "## 1.0.0-dev.1 (2026-10-13)\n\n### ✨ New Features\n\n* **Pinterest:** Add `Enable image download` patch ([d0e8e17](https://github.com/archivesteak/pinterest-patches/commit/d0e8e1708c5de55b1b1876b1d40c5edaefc9086e))",
-  "download_url": "https://github.com/archivesteak/pinterest-patches/releases/download/v1.0.0-dev.1/patches-1.0.0-dev.1.mpp",
+  "created_at": "2026-10-13T18:59:39",
+  "description": "## 1.0.0 (2026-10-13)\n\n### ✨ New Features\n\n* **Pinterest:** Add `Enable image download` patch ([d0e8e17](https://github.com/archivesteak/pinterest-patches/commit/d0e8e1708c5de55b1b1876b1d40c5edaefc9086e))",
+  "download_url": "https://github.com/archivesteak/pinterest-patches/releases/download/v1.0.0/patches-1.0.0.mpp",
   "signature_download_url": "",
-  "version": "1.0.0-dev.1"
+  "version": "1.0.0"
 }
