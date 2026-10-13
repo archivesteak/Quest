@@ -4,9 +4,11 @@ Patches for Pinterest, for use with [Morphe](https://morphe.software).
 
 ## Patches
 
-| Patch                 | Description                                                         |
-|-----------------------|---------------------------------------------------------------------|
-| Enable image download | Restores the "Download image" option in the Pin menu and share sheet. |
+| Patch                 | Description                                                                 |
+|-----------------------|-----------------------------------------------------------------------------|
+| Enable image download | Restores the "Download image" option in the Pin menu and share sheet.         |
+| Enable video download | Adds "Download image" to video Pins and saves the video in the best quality. |
+| Show date posted      | Adds the date a Pin was posted to the end of its expanded description.      |
 
 Supported Pinterest version: 14.39.0
 
