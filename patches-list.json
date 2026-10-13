@@ -1,10 +1,10 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.2.0",
+  "version": "1.3.0-dev.1",
   "patches": [
     {
       "name": "Customize long-press menu",
-      "description": "Adds Download to the menu shown when holding a Pin, and settings to choose which items the menu shows.",
+      "description": "Adds Download and Copy image to the menu shown when holding a Pin, and settings to choose which items the menu shows.",
       "default": true,
       "category": null,
       "compatiblePackages": [
