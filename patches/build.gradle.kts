@@ -1,14 +1,13 @@
-group = "app.template"
+group = "app.archivesteak"
 
 patches {
-    // TODO: Update this section with your project details.
     about {
-        name = "UserXYZ Patches"
-        description = "Patches for apps I like"
-        source = "git@github.com:UserXYZ/morphe-patches.git"
-        author = "Awesome dev"
-        contact = "na"
-        website = "na"
+        name = "Pinterest Patches"
+        description = "Patches for Pinterest"
+        source = "git@github.com:archivesteak/pinterest-patches.git"
+        author = "archivesteak"
+        contact = "https://github.com/archivesteak/pinterest-patches/issues"
+        website = "https://github.com/archivesteak/pinterest-patches"
         license = "GPLv3"
     }
 }
