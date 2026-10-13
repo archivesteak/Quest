@@ -7,6 +7,22 @@ Patches for Pinterest, for use with [Morphe](https://morphe.software).
 ## 🩹 Patches
 
 <!-- PATCHES_START EXPANDED -->
+> **[v1.0.0-dev.1](https://github.com/archivesteak/pinterest-patches/releases/tag/v1.0.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;1 patches total
+<details open>
+<summary>📦 Pinterest&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 14.39.0 |
+| :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Enable image download](#enable-image-download) | Restores the "Download image" option in the Pin menu and share sheet. |  |
+
+</details>
+
 <!-- PATCHES_END -->
 
 ## 🛠️ Building
