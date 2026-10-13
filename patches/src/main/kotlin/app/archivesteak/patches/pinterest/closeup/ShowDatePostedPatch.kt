@@ -1,6 +1,7 @@
 package app.archivesteak.patches.pinterest.closeup
 
 import app.archivesteak.patches.pinterest.misc.settings.settingsPatch
+import app.archivesteak.patches.pinterest.misc.settings.settingsStringsPatch
 import app.archivesteak.patches.pinterest.shared.Constants.COMPATIBILITY_PINTEREST
 import app.archivesteak.patches.pinterest.shared.EXTENSION_PACKAGE
 import app.archivesteak.patches.pinterest.shared.pinModelPatch
@@ -17,7 +18,15 @@ val showDatePostedPatch = bytecodePatch(
 ) {
     compatibleWith(COMPATIBILITY_PINTEREST)
 
-    dependsOn(settingsPatch, pinModelPatch)
+    dependsOn(
+        settingsPatch,
+        settingsStringsPatch(
+            "category_pin_page" to "Pin page",
+            "show_date_posted_title" to "Show date posted",
+            "show_date_posted_summary" to "Shows when a Pin was posted, above its creator.",
+        ),
+        pinModelPatch,
+    )
 
     execute {
         CreatorModuleUpdatePinFingerprint.method.addInstructions(

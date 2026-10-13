@@ -7,7 +7,6 @@ import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
-import app.morphe.patcher.patch.resourcePatch
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
@@ -19,39 +18,15 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 private const val UTILS_CLASS = "$EXTENSION_PACKAGE/shared/Utils;"
 private const val SETTINGS_MENU_CLASS = "$EXTENSION_PACKAGE/settings/SettingsMenuPatch;"
 
-private const val SETTINGS_TITLE = "Pinterest Patches"
-private const val SETTINGS_TITLE_RESOURCE = "archivesteak_patches_settings_title"
-
-private const val SETTINGS_ROWS_PACKAGE = "Lcom/pinterest/feature/settings/menu/model/"
+internal const val SETTINGS_ROWS_PACKAGE = "Lcom/pinterest/feature/settings/menu/model/"
 private const val SCREEN_LOCATION = "Lcom/pinterest/framework/screens/ScreenLocation;"
 
-private val settingsResourcePatch = resourcePatch {
-    execute {
-        document("res/values/strings.xml").use { document ->
-            document.documentElement.appendChild(
-                document.createElement("string").apply {
-                    setAttribute("name", SETTINGS_TITLE_RESOURCE)
-                    textContent = SETTINGS_TITLE
-                }
-            )
-        }
-
-        document("AndroidManifest.xml").use { document ->
-            document.getElementsByTagName("application").item(0).appendChild(
-                document.createElement("activity").apply {
-                    setAttribute("android:name", "app.archivesteak.extension.pinterest.settings.SettingsActivity")
-                    setAttribute("android:exported", "false")
-                    setAttribute("android:label", SETTINGS_TITLE)
-                    setAttribute("android:theme", "@android:style/Theme.DeviceDefault.DayNight")
-                }
-            )
-        }
-    }
-}
-
-/** Adds a row to the app's settings that opens the patch settings. */
+/**
+ * Adds a row to the app's settings that opens the patch settings.
+ * Patches with settings depend on this, and add the strings of their settings with [settingsStringsPatch].
+ */
 val settingsPatch = bytecodePatch {
-    dependsOn(settingsResourcePatch)
+    dependsOn(settingsStringsPatch("title" to "Pinterest Patches"))
 
     extendWith("extensions/pinterest.mpe")
 
@@ -100,12 +75,16 @@ val settingsPatch = bytecodePatch {
         }
 
         // Open the patch settings when the row is tapped.
-        SettingsRowBindFingerprint.method.addInstructions(
-            0,
-            "invoke-static/range { p0 .. p1 }, $SETTINGS_MENU_CLASS->onBindRow(Landroid/view/View;Ljava/lang/Object;)V"
-        )
+        SettingsRowBindFingerprint.matchAll().forEach { match ->
+            match.method.addInstructions(
+                0,
+                "invoke-static/range { p0 .. p1 }, $SETTINGS_MENU_CLASS->onBindRow(Landroid/view/View;Ljava/lang/Object;)V"
+            )
+        }
 
         // endregion
+
+        showSettingsOnPermissionsScreen()
     }
 }
 

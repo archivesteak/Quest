@@ -1,6 +1,7 @@
 package app.archivesteak.patches.pinterest.menu
 
 import app.archivesteak.patches.pinterest.misc.settings.settingsPatch
+import app.archivesteak.patches.pinterest.misc.settings.settingsStringsPatch
 import app.archivesteak.patches.pinterest.shared.Constants.COMPATIBILITY_PINTEREST
 import app.archivesteak.patches.pinterest.shared.EXTENSION_PACKAGE
 import app.archivesteak.patches.pinterest.shared.addInstructionsAtBranchTarget
@@ -27,7 +28,25 @@ val longPressMenuPatch = bytecodePatch(
 ) {
     compatibleWith(COMPATIBILITY_PINTEREST)
 
-    dependsOn(settingsPatch, pinModelPatch)
+    dependsOn(
+        settingsPatch,
+        // Keys of the app's items end with the app's name for them.
+        settingsStringsPatch(
+            "category_long_press_menu" to "Long-press menu",
+            "long_press_download_title" to "Download",
+            "long_press_download_summary" to "Saves the image, or the video of video Pins.",
+            "long_press_REPIN_title" to "Save",
+            "long_press_SEND_title" to "Send",
+            "long_press_SEE_MORE_title" to "See more like this",
+            "long_press_HIDE_title" to "See less",
+            "long_press_VISUAL_SEARCH_title" to "Search image",
+            "long_press_EDIT_title" to "Edit",
+            "long_press_EDIT_summary" to "Only on your own Pins.",
+            "long_press_REORDER_title" to "Reorder",
+            "long_press_REORDER_summary" to "Only on your boards.",
+        ),
+        pinModelPatch,
+    )
 
     execute {
         // region Remove the menu items turned off in settings.

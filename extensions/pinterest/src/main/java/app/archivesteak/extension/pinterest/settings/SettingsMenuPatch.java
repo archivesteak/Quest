@@ -2,10 +2,12 @@ package app.archivesteak.extension.pinterest.settings;
 
 import static app.archivesteak.extension.pinterest.shared.Utils.TAG;
 
-import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -15,11 +17,14 @@ import java.util.WeakHashMap;
 import app.archivesteak.extension.pinterest.shared.Utils;
 
 /**
- * Adds a row to the app's settings that opens {@link SettingsActivity}.
+ * Adds a row to the app's settings that opens the patch settings, see {@link SettingsScreenPatch}.
  */
 @SuppressWarnings("unused")
 public final class SettingsMenuPatch {
-    private static final String TITLE_RESOURCE = "archivesteak_patches_settings_title";
+    /**
+     * Id of the Social permissions row, whose screen shows the patch settings when the patches row opens it.
+     */
+    private static final String SCREEN_ROW_ID = "settings_social_permission";
 
     /**
      * Rows created by {@link #addSettingsRow(List)}. A new one is made every time the list is built.
@@ -32,12 +37,19 @@ public final class SettingsMenuPatch {
     private static final Map<View, Object> boundRows = new WeakHashMap<>();
 
     /**
+     * The Social permissions row of the main settings screen.
+     */
+    private static WeakReference<Object> screenRow = new WeakReference<>(null);
+
+    /**
      * Injection point. Called with the rows of the main settings screen.
      * Adds the patches row first among the rows that open another screen.
      */
     public static void addSettingsRow(List<Object> rows) {
         try {
-            Object patchRow = createRow(Utils.getResourceId(TITLE_RESOURCE, "string"), null);
+            screenRow = new WeakReference<>(findRow(rows, Utils.getResourceId(SCREEN_ROW_ID, "id")));
+
+            Object patchRow = createRow(Settings.getStringResource("title"), null);
             patchRows.add(patchRow);
 
             int viewType = viewTypeOf(patchRow);
@@ -66,9 +78,53 @@ public final class SettingsMenuPatch {
         view.post(() -> {
             if (boundRows.get(view) != row) return;
 
-            view.setOnClickListener(v ->
-                    v.getContext().startActivity(new Intent(v.getContext(), SettingsActivity.class)));
+            view.setOnClickListener(SettingsMenuPatch::openSettings);
         });
+    }
+
+    /**
+     * Opens the Social permissions screen the way tapping its row does,
+     * and has it show the patch settings.
+     */
+    private static void openSettings(View rowView) {
+        try {
+            Object row = screenRow.get();
+            if (row == null) throw new IllegalStateException("Social permissions row not found");
+
+            Class<?> function = Class.forName("kotlin.jvm.functions.Function1");
+            Object onRowClick = findFieldValue(rowView, function);
+            if (onRowClick == null) throw new IllegalStateException("Row click handler not found");
+
+            SettingsScreenPatch.onOpen();
+            function.getMethod("invoke", Object.class).invoke(onRowClick, row);
+        } catch (Exception ex) {
+            Log.e(TAG, "Failed to open settings", ex);
+        }
+    }
+
+    private static Object findRow(List<Object> rows, int id) {
+        for (Object row : rows) {
+            try {
+                if ((int) row.getClass().getMethod("getId").invoke(row) == id) return row;
+            } catch (ReflectiveOperationException ignored) {
+                // Rows without an id.
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return The value of the first field of the object that is an instance of the type, or null.
+     */
+    private static Object findFieldValue(Object object, Class<?> type) throws IllegalAccessException {
+        for (Field field : object.getClass().getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers())) continue;
+
+            field.setAccessible(true);
+            Object value = field.get(object);
+            if (type.isInstance(value)) return value;
+        }
+        return null;
     }
 
     private static int viewTypeOf(Object row) throws Exception {
