@@ -15,7 +15,7 @@ import com.android.tools.smali.dexlib2.iface.value.StringEncodedValue
  * with its JSON name. These helpers find model classes, fields and getters by those names.
  */
 
-private const val MODEL_PACKAGE = "Lcom/pinterest/api/model/"
+internal const val MODEL_PACKAGE = "Lcom/pinterest/api/model/"
 
 /** JSON name of a model field, read from its serialized-name annotation. */
 val Field.jsonName: String?
@@ -46,11 +46,17 @@ fun ClassDef.getterOf(field: Field): Method = methods.single { method ->
 
 /** Value type of a `Map<String, V>` field, read from its generic signature. */
 val Field.mapValueType: String
+    get() = Regex("^Ljava/util/Map<Ljava/lang/String;(L[^<>;]+;)>;$").find(genericType)!!.groupValues[1]
+
+/** Element type of a `List<E>` field, read from its generic signature. */
+val Field.listElementType: String
+    get() = Regex("^Ljava/util/List<(L[^<>;]+;)>;$").find(genericType)!!.groupValues[1]
+
+private val Field.genericType: String
     get() {
         val signature = annotations.single { it.type == "Ldalvik/annotation/Signature;" }
             .elements.single().value as ArrayEncodedValue
-        val genericType = signature.value.joinToString("") { (it as StringEncodedValue).value }
-        return Regex("^Ljava/util/Map<Ljava/lang/String;(L[^<>;]+;)>;$").find(genericType)!!.groupValues[1]
+        return signature.value.joinToString("") { (it as StringEncodedValue).value }
     }
 
 /** Smali reference to [method], e.g. `Lfoo;->bar()Ljava/lang/String;`. */
