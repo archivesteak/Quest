@@ -1,3 +1,11 @@
+## [1.2.0](https://github.com/archivesteak/pinterest-patches/compare/v1.1.0...v1.2.0) (2026-10-13)
+
+### ✨ New Features
+
+* **Pinterest - Show date posted:** Show the date above the Pin's creator, with an option to turn it off ([aa6e91b](https://github.com/archivesteak/pinterest-patches/commit/aa6e91b2c84ec2dc177224e09687663bfaf1f29e))
+* **Pinterest:** Add `Customize long-press menu` patch ([b3b2e75](https://github.com/archivesteak/pinterest-patches/commit/b3b2e75e300e3091fe979b9259051b74a1eb29ff))
+* **Pinterest:** Add patch settings to the app's settings ([455e7e6](https://github.com/archivesteak/pinterest-patches/commit/455e7e6bb204267e6c01638a6619b754b5cd0285))
+
 ## [1.2.0-dev.1](https://github.com/archivesteak/pinterest-patches/compare/v1.1.0...v1.2.0-dev.1) (2026-10-13)
 
 ### ✨ New Features
