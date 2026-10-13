@@ -18,11 +18,13 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 private const val EXTENSION_CLASS = "$EXTENSION_PACKAGE/LongPressMenuPatch;"
 private const val MENU_ITEM_VIEW = "Lcom/pinterest/ui/menu/ContextMenuItemView;"
+private const val DOWNLOAD_ICON = "DOWNLOAD"
+private const val COPY_ICON = "COPY_TO_CLIPBOARD"
 
 @Suppress("unused")
 val longPressMenuPatch = bytecodePatch(
     name = "Customize long-press menu",
-    description = "Adds Download to the menu shown when holding a Pin, " +
+    description = "Adds Download and Copy image to the menu shown when holding a Pin, " +
         "and settings to choose which items the menu shows.",
     default = true
 ) {
@@ -35,6 +37,8 @@ val longPressMenuPatch = bytecodePatch(
             "category_long_press_menu" to "Long-press menu",
             "long_press_download_title" to "Download",
             "long_press_download_summary" to "Saves the image, or the video of video Pins.",
+            "long_press_copy_image_title" to "Copy image",
+            "long_press_copy_image_summary" to "Copies the image to the clipboard.",
             "long_press_REPIN_title" to "Save",
             "long_press_SEND_title" to "Send",
             "long_press_SEE_MORE_title" to "See more like this",
@@ -100,8 +104,9 @@ val longPressMenuPatch = bytecodePatch(
             it.name == "<init>" && it.parameterTypes.size == 4
         }
         val iconType = itemModelConstructor.parameterTypes[0].toString()
-        if (classDefBy(iconType).fields.none { it.name == "DOWNLOAD" }) {
-            throw PatchException("Download icon not found")
+        val iconNames = classDefBy(iconType).fields.map { it.name }
+        listOf(DOWNLOAD_ICON, COPY_ICON).forEach { icon ->
+            if (icon !in iconNames) throw PatchException("Icon $icon not found")
         }
 
         val extensionMethods = mutableClassDefBy(EXTENSION_CLASS).methods
@@ -113,13 +118,27 @@ val longPressMenuPatch = bytecodePatch(
                 return-object p0
             """
         )
-        // Extension stubs may have no registers besides their parameters. The icon parameter (p2)
-        // holds the icon, the action parameter (p3) is null and the item parameter (p4) holds the item.
+        extensionMethods.single { it.name == "getDownloadIcon" }.addInstructions(
+            0,
+            """
+                sget-object v0, $iconType->$DOWNLOAD_ICON:$iconType
+                return-object v0
+            """
+        )
+        extensionMethods.single { it.name == "getCopyIcon" }.addInstructions(
+            0,
+            """
+                sget-object v0, $iconType->$COPY_ICON:$iconType
+                return-object v0
+            """
+        )
+        // Extension stubs may have no registers besides their parameters.
+        // The action parameter (p3) is null and the item parameter (p4) holds the item.
         extensionMethods.single { it.name == "createMenuItem" }.addInstructions(
             0,
             """
                 new-instance p4, $itemModelType
-                sget-object p2, $iconType->DOWNLOAD:$iconType
+                check-cast p2, $iconType
                 invoke-direct { p4, p2, p1, p1, p3 }, $itemModelType-><init>(${itemModelConstructor.parameterTypes.joinToString("")})V
                 invoke-static { p0, p4 }, ${itemFactory.definingClass}->${itemFactory.name}(Landroid/content/Context;$itemModelType)$MENU_ITEM_VIEW
                 move-result-object p4

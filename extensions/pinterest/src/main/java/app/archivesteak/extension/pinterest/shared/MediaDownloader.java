@@ -231,7 +231,10 @@ public final class MediaDownloader {
         return url == null || url.isEmpty() ? null : url;
     }
 
-    private static String findImageUrl(Map<String, ?> images) {
+    /**
+     * @return Url of the largest of the images, or null.
+     */
+    static String findImageUrl(Map<String, ?> images) {
         if (images == null || images.isEmpty()) return null;
 
         for (String size : IMAGE_SIZES) {

@@ -35,6 +35,7 @@ public final class Settings {
     // region Long-press menu
 
     public static final BooleanSetting LONG_PRESS_DOWNLOAD = new BooleanSetting("long_press_download", true, LONG_PRESS_MENU);
+    public static final BooleanSetting LONG_PRESS_COPY_IMAGE = new BooleanSetting("long_press_copy_image", true, LONG_PRESS_MENU);
 
     // Keys end with the app's name for the menu item.
     public static final BooleanSetting LONG_PRESS_SAVE = new BooleanSetting("long_press_REPIN", true, LONG_PRESS_MENU);
