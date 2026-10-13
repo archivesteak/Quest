@@ -1,3 +1,10 @@
+## [1.1.0](https://github.com/archivesteak/pinterest-patches/compare/v1.0.0...v1.1.0) (2026-10-13)
+
+### ✨ New Features
+
+* **Pinterest:** Add `Enable video download` patch ([8384c66](https://github.com/archivesteak/pinterest-patches/commit/8384c66d384c344da9050e60c0133c5d08360117))
+* **Pinterest:** Add `Show date posted` patch ([171693e](https://github.com/archivesteak/pinterest-patches/commit/171693e4148dd71867b28c097673ffc329d9b6e6))
+
 ## [1.1.0-dev.1](https://github.com/archivesteak/pinterest-patches/compare/v1.0.0...v1.1.0-dev.1) (2026-10-13)
 
 ### ✨ New Features
