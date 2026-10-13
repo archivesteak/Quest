@@ -16,6 +16,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 private const val EXTENSION_CLASS = "$EXTENSION_PACKAGE/LongPressMenuPatch;"
+private const val MENU_ITEM_VIEW = "Lcom/pinterest/ui/menu/ContextMenuItemView;"
 
 @Suppress("unused")
 val longPressMenuPatch = bytecodePatch(
@@ -64,6 +65,16 @@ val longPressMenuPatch = bytecodePatch(
         val menuBuilderClass = PinLongPressMenuBuilderFingerprint.originalClassDef
         val menuPinField = menuBuilderClass.fields.single { it.type == pinClass.type }
 
+        // The builder styles every item it makes, which sets the item's colors for each theme.
+        val styleItemMethods = PinLongPressMenuBuilderFingerprint.originalMethod.implementation!!.instructions
+            .filter { it.opcode == Opcode.INVOKE_STATIC }
+            .map { (it as ReferenceInstruction).reference as MethodReference }
+            .filter { it.returnType == "V" && it.parameterTypes.map(CharSequence::toString) == listOf(MENU_ITEM_VIEW) }
+            .map { "${it.definingClass}->${it.name}(${MENU_ITEM_VIEW})V" }
+            .distinct()
+        val styleItemMethod = styleItemMethods.singleOrNull()
+            ?: throw PatchException("Expected one long-press menu item style method, found $styleItemMethods")
+
         val itemFactory = ContextMenuItemFactoryFingerprint.originalMethod
         val itemModelType = itemFactory.parameterTypes[1].toString()
         val itemModelConstructor = classDefBy(itemModelType).methods.single {
@@ -91,8 +102,9 @@ val longPressMenuPatch = bytecodePatch(
                 new-instance p4, $itemModelType
                 sget-object p2, $iconType->DOWNLOAD:$iconType
                 invoke-direct { p4, p2, p1, p1, p3 }, $itemModelType-><init>(${itemModelConstructor.parameterTypes.joinToString("")})V
-                invoke-static { p0, p4 }, ${itemFactory.definingClass}->${itemFactory.name}(Landroid/content/Context;$itemModelType)Lcom/pinterest/ui/menu/ContextMenuItemView;
+                invoke-static { p0, p4 }, ${itemFactory.definingClass}->${itemFactory.name}(Landroid/content/Context;$itemModelType)$MENU_ITEM_VIEW
                 move-result-object p4
+                invoke-static { p4 }, $styleItemMethod
                 return-object p4
             """
         )
