@@ -1,6 +1,7 @@
 package app.archivesteak.extension.pinterest.shared;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,6 +29,39 @@ public final class PinModel {
      * Video encodings of the Pin keyed by encoding name, or null if the Pin has no video.
      */
     public static Map<String, ?> getVideoList(Object pin) {
+        return null;
+    }
+
+    /**
+     * Pages of the Pin if it's an Idea Pin, or null.
+     */
+    public static List<?> getStoryPages(Object pin) {
+        return null;
+    }
+
+    /**
+     * Preview of the pages of the Pin if it's an Idea Pin, or null.
+     * Pins in feeds can have only this.
+     */
+    public static List<?> getStoryPagesPreview(Object pin) {
+        return null;
+    }
+
+    public static List<?> getPageBlocks(Object page) {
+        return null;
+    }
+
+    /**
+     * Video encodings of an Idea Pin page, like {@link #getVideoList(Object)}.
+     */
+    public static Map<String, ?> getPageVideoList(Object page) {
+        return null;
+    }
+
+    /**
+     * Video encodings of an Idea Pin page block, or null if it isn't a video block.
+     */
+    public static Map<String, ?> getBlockVideoList(Object block) {
         return null;
     }
 

@@ -16,6 +16,18 @@ internal object GridActionsViewParamsToStringFingerprint : Fingerprint(
     )
 )
 
+internal const val IS_STATIC_IMAGE_IDEA_PIN_LABEL = ", isStaticImageIdeaPin="
+
+/** `OverflowMenuCreationConfig.toString()`, more options the Pin overflow menu is built from. */
+internal object OverflowMenuCreationConfigToStringFingerprint : Fingerprint(
+    name = "toString",
+    returnType = "Ljava/lang/String;",
+    filters = listOf(
+        string("OverflowMenuCreationConfig(isPinCloseup="),
+        string(IS_STATIC_IMAGE_IDEA_PIN_LABEL),
+    )
+)
+
 /** Static initializer of the Pin overflow menu item enum (`COPY_LINK`, `DOWNLOAD`, ...). */
 internal object OverflowMenuItemEnumFingerprint : Fingerprint(
     name = "<clinit>",

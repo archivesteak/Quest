@@ -12,6 +12,7 @@ import java.util.List;
 
 import app.archivesteak.extension.pinterest.settings.BooleanSetting;
 import app.archivesteak.extension.pinterest.settings.Settings;
+import app.archivesteak.extension.pinterest.shared.ImageClipboard;
 import app.archivesteak.extension.pinterest.shared.MediaDownloader;
 import app.archivesteak.extension.pinterest.shared.Utils;
 
@@ -57,19 +58,32 @@ public final class LongPressMenuPatch {
     public static List<?> addMenuItems(View menu, List<?> items) {
         Object pin = menuPin.get();
         menuPin = new WeakReference<>(null);
-        if (pin == null || !Settings.LONG_PRESS_DOWNLOAD.get()) return items;
+        if (pin == null) return items;
 
+        List<Object> withPatchItems = new ArrayList<>(items);
+        if (Settings.LONG_PRESS_DOWNLOAD.get()) {
+            addMenuItem(withPatchItems, menu, "download", getDownloadIcon(),
+                    v -> MediaDownloader.download(v.getContext(), pin));
+        }
+        if (Settings.LONG_PRESS_COPY_IMAGE.get()) {
+            addMenuItem(withPatchItems, menu, "copy", getCopyIcon(),
+                    v -> ImageClipboard.copy(v.getContext(), pin));
+        }
+        return withPatchItems;
+    }
+
+    /**
+     * @param label Name of the app's string to label the item with.
+     */
+    private static void addMenuItem(List<Object> items, View menu, String label, Object icon,
+                                    View.OnClickListener onClick) {
         try {
-            View download = createMenuItem(menu.getContext(), Utils.getResourceId("download", "string"), null, null, null);
+            View item = createMenuItem(menu.getContext(), Utils.getResourceId(label, "string"), icon, null, null);
             // Replaces the item's own listener, which would run the null action passed above.
-            download.setOnClickListener(v -> MediaDownloader.download(v.getContext(), pin));
-
-            List<Object> withDownload = new ArrayList<>(items);
-            withDownload.add(download);
-            return withDownload;
+            item.setOnClickListener(onClick);
+            items.add(item);
         } catch (Exception ex) {
-            Log.e(TAG, "Failed to add long-press download item", ex);
-            return items;
+            Log.e(TAG, "Failed to add long-press menu item " + label, ex);
         }
     }
 
@@ -81,10 +95,24 @@ public final class LongPressMenuPatch {
     }
 
     /**
-     * Creates a menu item view with a download icon. Implemented by the patch,
-     * which uses the last three parameters as registers for the icon, the null action and the item.
+     * Creates a menu item view. Implemented by the patch,
+     * which uses the last two parameters as registers for the null action and the item.
      */
     private static View createMenuItem(Context context, int label, Object icon, Object action, Object item) {
+        return null;
+    }
+
+    /**
+     * Implemented by the patch.
+     */
+    private static Object getDownloadIcon() {
+        return null;
+    }
+
+    /**
+     * Implemented by the patch.
+     */
+    private static Object getCopyIcon() {
         return null;
     }
 }

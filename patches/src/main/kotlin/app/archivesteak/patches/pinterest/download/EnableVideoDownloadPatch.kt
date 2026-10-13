@@ -11,6 +11,7 @@ import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import app.morphe.patcher.fieldAccess
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
+import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patcher.util.smali.ExternalLabel
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.ReferenceType
@@ -40,9 +41,12 @@ val enableVideoDownloadPatch = bytecodePatch(
     execute {
         // region Show the download row for video Pins.
 
-        // The menu builders skip the download row when GridActionsViewParams.isVideo is set.
+        // The menu builders skip the download row when GridActionsViewParams.isVideo is set,
+        // and for Idea Pins, which most video Pins are, unless OverflowMenuCreationConfig.isStaticImageIdeaPin is set.
         val isVideoField = GridActionsViewParamsToStringFingerprint.originalMethod
             .fieldPrintedAfter(IS_VIDEO_LABEL)
+        val isStaticImageIdeaPinField = OverflowMenuCreationConfigToStringFingerprint.originalMethod
+            .fieldPrintedAfter(IS_STATIC_IMAGE_IDEA_PIN_LABEL)
         val menuItemType = OverflowMenuItemEnumFingerprint.originalClassDef.type
 
         val menuBuilders = Fingerprint(
@@ -52,19 +56,10 @@ val enableVideoDownloadPatch = bytecodePatch(
             )
         ).matchAll()
 
-        // isVideo is only used for the download row in these methods, so it can be read as false.
+        // Both are only used for the download row in these methods, so they can be read as constants.
         menuBuilders.forEach { match ->
-            match.method.apply {
-                implementation!!.instructions.withIndex().filter { (_, instruction) ->
-                    instruction.opcode == Opcode.IGET_BOOLEAN &&
-                        ((instruction as ReferenceInstruction).reference as FieldReference).let {
-                            it.definingClass == isVideoField.definingClass && it.name == isVideoField.name
-                        }
-                }.map { it.index }.reversed().forEach { index ->
-                    val register = getInstruction<TwoRegisterInstruction>(index).registerA
-                    replaceInstruction(index, "const/4 v$register, 0x0")
-                }
-            }
+            match.method.replaceBooleanReads(isVideoField, false)
+            match.method.replaceBooleanReads(isStaticImageIdeaPinField, true)
         }
 
         // endregion
@@ -105,6 +100,18 @@ val enableVideoDownloadPatch = bytecodePatch(
  * and loads values out of order, so the field is found by following the label's register
  * to the call that prints it, then the value register back to the field read.
  */
+private fun MutableMethod.replaceBooleanReads(field: FieldReference, value: Boolean) {
+    implementation!!.instructions.withIndex().filter { (_, instruction) ->
+        instruction.opcode == Opcode.IGET_BOOLEAN &&
+            ((instruction as ReferenceInstruction).reference as FieldReference).let {
+                it.definingClass == field.definingClass && it.name == field.name
+            }
+    }.map { it.index }.reversed().forEach { index ->
+        val register = getInstruction<TwoRegisterInstruction>(index).registerA
+        replaceInstruction(index, "const/4 v$register, ${if (value) "0x1" else "0x0"}")
+    }
+}
+
 private fun Method.fieldPrintedAfter(label: String): FieldReference {
     val instructions = implementation!!.instructions.toList()
 

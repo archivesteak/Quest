@@ -1,6 +1,7 @@
 package app.archivesteak.patches.pinterest.menu
 
 import app.archivesteak.patches.pinterest.misc.settings.settingsPatch
+import app.archivesteak.patches.pinterest.misc.settings.settingsStringsPatch
 import app.archivesteak.patches.pinterest.shared.Constants.COMPATIBILITY_PINTEREST
 import app.archivesteak.patches.pinterest.shared.EXTENSION_PACKAGE
 import app.archivesteak.patches.pinterest.shared.addInstructionsAtBranchTarget
@@ -16,17 +17,40 @@ import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 private const val EXTENSION_CLASS = "$EXTENSION_PACKAGE/LongPressMenuPatch;"
+private const val MENU_ITEM_VIEW = "Lcom/pinterest/ui/menu/ContextMenuItemView;"
+private const val DOWNLOAD_ICON = "DOWNLOAD"
+private const val COPY_ICON = "COPY_TO_CLIPBOARD"
 
 @Suppress("unused")
 val longPressMenuPatch = bytecodePatch(
     name = "Customize long-press menu",
-    description = "Adds Download to the menu shown when holding a Pin, " +
+    description = "Adds Download and Copy image to the menu shown when holding a Pin, " +
         "and settings to choose which items the menu shows.",
     default = true
 ) {
     compatibleWith(COMPATIBILITY_PINTEREST)
 
-    dependsOn(settingsPatch, pinModelPatch)
+    dependsOn(
+        settingsPatch,
+        // Keys of the app's items end with the app's name for them.
+        settingsStringsPatch(
+            "category_long_press_menu" to "Long-press menu",
+            "long_press_download_title" to "Download",
+            "long_press_download_summary" to "Saves the image, or the video of video Pins.",
+            "long_press_copy_image_title" to "Copy image",
+            "long_press_copy_image_summary" to "Copies the image to the clipboard.",
+            "long_press_REPIN_title" to "Save",
+            "long_press_SEND_title" to "Send",
+            "long_press_SEE_MORE_title" to "See more like this",
+            "long_press_HIDE_title" to "See less",
+            "long_press_VISUAL_SEARCH_title" to "Search image",
+            "long_press_EDIT_title" to "Edit",
+            "long_press_EDIT_summary" to "Only on your own Pins.",
+            "long_press_REORDER_title" to "Reorder",
+            "long_press_REORDER_summary" to "Only on your boards.",
+        ),
+        pinModelPatch,
+    )
 
     execute {
         // region Remove the menu items turned off in settings.
@@ -64,14 +88,25 @@ val longPressMenuPatch = bytecodePatch(
         val menuBuilderClass = PinLongPressMenuBuilderFingerprint.originalClassDef
         val menuPinField = menuBuilderClass.fields.single { it.type == pinClass.type }
 
+        // The builder styles every item it makes, which sets the item's colors for each theme.
+        val styleItemMethods = PinLongPressMenuBuilderFingerprint.originalMethod.implementation!!.instructions
+            .filter { it.opcode == Opcode.INVOKE_STATIC }
+            .map { (it as ReferenceInstruction).reference as MethodReference }
+            .filter { it.returnType == "V" && it.parameterTypes.map(CharSequence::toString) == listOf(MENU_ITEM_VIEW) }
+            .map { "${it.definingClass}->${it.name}(${MENU_ITEM_VIEW})V" }
+            .distinct()
+        val styleItemMethod = styleItemMethods.singleOrNull()
+            ?: throw PatchException("Expected one long-press menu item style method, found $styleItemMethods")
+
         val itemFactory = ContextMenuItemFactoryFingerprint.originalMethod
         val itemModelType = itemFactory.parameterTypes[1].toString()
         val itemModelConstructor = classDefBy(itemModelType).methods.single {
             it.name == "<init>" && it.parameterTypes.size == 4
         }
         val iconType = itemModelConstructor.parameterTypes[0].toString()
-        if (classDefBy(iconType).fields.none { it.name == "DOWNLOAD" }) {
-            throw PatchException("Download icon not found")
+        val iconNames = classDefBy(iconType).fields.map { it.name }
+        listOf(DOWNLOAD_ICON, COPY_ICON).forEach { icon ->
+            if (icon !in iconNames) throw PatchException("Icon $icon not found")
         }
 
         val extensionMethods = mutableClassDefBy(EXTENSION_CLASS).methods
@@ -83,16 +118,31 @@ val longPressMenuPatch = bytecodePatch(
                 return-object p0
             """
         )
-        // Extension stubs may have no registers besides their parameters. The icon parameter (p2)
-        // holds the icon, the action parameter (p3) is null and the item parameter (p4) holds the item.
+        extensionMethods.single { it.name == "getDownloadIcon" }.addInstructions(
+            0,
+            """
+                sget-object v0, $iconType->$DOWNLOAD_ICON:$iconType
+                return-object v0
+            """
+        )
+        extensionMethods.single { it.name == "getCopyIcon" }.addInstructions(
+            0,
+            """
+                sget-object v0, $iconType->$COPY_ICON:$iconType
+                return-object v0
+            """
+        )
+        // Extension stubs may have no registers besides their parameters.
+        // The action parameter (p3) is null and the item parameter (p4) holds the item.
         extensionMethods.single { it.name == "createMenuItem" }.addInstructions(
             0,
             """
                 new-instance p4, $itemModelType
-                sget-object p2, $iconType->DOWNLOAD:$iconType
+                check-cast p2, $iconType
                 invoke-direct { p4, p2, p1, p1, p3 }, $itemModelType-><init>(${itemModelConstructor.parameterTypes.joinToString("")})V
-                invoke-static { p0, p4 }, ${itemFactory.definingClass}->${itemFactory.name}(Landroid/content/Context;$itemModelType)Lcom/pinterest/ui/menu/ContextMenuItemView;
+                invoke-static { p0, p4 }, ${itemFactory.definingClass}->${itemFactory.name}(Landroid/content/Context;$itemModelType)$MENU_ITEM_VIEW
                 move-result-object p4
+                invoke-static { p4 }, $styleItemMethod
                 return-object p4
             """
         )

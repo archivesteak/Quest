@@ -1,3 +1,16 @@
+## [1.3.0-dev.1](https://github.com/archivesteak/pinterest-patches/compare/v1.2.0...v1.3.0-dev.1) (2026-10-13)
+
+### 🐛 Bug Fixes
+
+* **Pinterest - Customize long-press menu:** Style the Download item like the app's other items ([579e42c](https://github.com/archivesteak/pinterest-patches/commit/579e42c30cbc2e2e259d1b5fc49321b368853cb8))
+* **Pinterest - Enable video download:** Download videos of Idea Pins and of Pins in feeds ([42bf7f8](https://github.com/archivesteak/pinterest-patches/commit/42bf7f844d830dbb1ea6a549e85dbcd363b8e2ac))
+* **Pinterest - Show date posted:** Show only the date, in the app's font ([ac279b0](https://github.com/archivesteak/pinterest-patches/commit/ac279b08a9a7addcb591bb6c6bc3ad4dc112b8b4))
+
+### ✨ New Features
+
+* **Pinterest - Customize long-press menu:** Add Copy image, which copies the image to the clipboard ([cf28e7c](https://github.com/archivesteak/pinterest-patches/commit/cf28e7c94a7c6207db3daef1450d41bb098d8c8c))
+* **Pinterest:** Show patch settings on a settings screen of the app, with its own rows and switches ([90c3136](https://github.com/archivesteak/pinterest-patches/commit/90c3136855f97895b5f1f73db7495b09075d2d25))
+
 ## [1.2.0](https://github.com/archivesteak/pinterest-patches/compare/v1.1.0...v1.2.0) (2026-10-13)
 
 ### ✨ New Features
