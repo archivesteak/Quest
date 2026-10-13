@@ -16,11 +16,13 @@ import java.util.Date;
 
 import app.archivesteak.extension.pinterest.settings.Settings;
 import app.archivesteak.extension.pinterest.shared.PinModel;
+import app.archivesteak.extension.pinterest.shared.Utils;
 
 @SuppressWarnings("unused")
 public final class DatePostedPatch {
     private static final String CREATOR_VIEW_CLASS = "com.pinterest.activity.pin.view.PinCloseupCreatorAttributionView";
     private static final String DATE_VIEW_TAG = "archivesteak_date_posted";
+    private static final String APP_FONT = "pin_sans_regular";
 
     /**
      * Injection point. Called when the Pin page's creator module is bound to a Pin.
@@ -46,7 +48,7 @@ public final class DatePostedPatch {
                 dateView = createDateView(content.getContext());
                 content.addView(dateView, 0);
             }
-            dateView.setText("Posted " + DateFormat.getDateInstance(DateFormat.LONG).format(datePosted));
+            dateView.setText(DateFormat.getDateInstance(DateFormat.LONG).format(datePosted));
             dateView.setVisibility(View.VISIBLE);
         } catch (Exception ex) {
             Log.e(TAG, "Failed to show date posted", ex);
@@ -70,6 +72,12 @@ public final class DatePostedPatch {
         TextView dateView = new TextView(context);
         dateView.setTag(DATE_VIEW_TAG);
         dateView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+
+        try {
+            dateView.setTypeface(context.getResources().getFont(Utils.getResourceId(APP_FONT, "font")));
+        } catch (Exception ex) {
+            Log.e(TAG, "Failed to load the app's font", ex);
+        }
 
         TypedArray attributes = context.obtainStyledAttributes(new int[]{android.R.attr.textColorSecondary});
         dateView.setTextColor(attributes.getColorStateList(0));
