@@ -25,6 +25,11 @@ public final class LongPressMenuPatch {
     private static WeakReference<Object> menuPin = new WeakReference<>(null);
 
     /**
+     * Id of the kind of the app's item that sends with the app the Pin was last shared with.
+     */
+    private static final String SHARE_APP_ITEM = "context_share_recent";
+
+    /**
      * Injection point. Called when a Pin's long-press menu is built.
      *
      * @param menuBuilder Builds the menu, and holds the Pin it's for.
@@ -58,9 +63,11 @@ public final class LongPressMenuPatch {
     public static List<?> addMenuItems(View menu, List<?> items) {
         Object pin = menuPin.get();
         menuPin = new WeakReference<>(null);
-        if (pin == null) return items;
 
         List<Object> withPatchItems = new ArrayList<>(items);
+        if (!Settings.LONG_PRESS_SHARE_APP.get()) removeShareAppItem(withPatchItems);
+        if (pin == null) return withPatchItems;
+
         if (Settings.LONG_PRESS_DOWNLOAD.get()) {
             addMenuItem(withPatchItems, menu, "download", getDownloadIcon(),
                     v -> MediaDownloader.download(v.getContext(), pin));
@@ -70,6 +77,21 @@ public final class LongPressMenuPatch {
                     v -> ImageClipboard.copy(v.getContext(), pin));
         }
         return withPatchItems;
+    }
+
+    /**
+     * Removes the item that sends with the app the Pin was last shared with.
+     * Unlike the other items, it's made after the menu's item types are filtered.
+     */
+    private static void removeShareAppItem(List<Object> items) {
+        try {
+            int shareApp = Utils.getResourceId(SHARE_APP_ITEM, "id");
+            if (shareApp == 0) return;
+
+            items.removeIf(item -> item instanceof View && getMenuItemKind((View) item) == shareApp);
+        } catch (Exception ex) {
+            Log.e(TAG, "Failed to remove share app item", ex);
+        }
     }
 
     /**
@@ -100,6 +122,13 @@ public final class LongPressMenuPatch {
      */
     private static View createMenuItem(Context context, int label, Object icon, Object action, Object item) {
         return null;
+    }
+
+    /**
+     * The id of the kind of a menu item, such as {@link #SHARE_APP_ITEM}. Implemented by the patch.
+     */
+    private static int getMenuItemKind(View item) {
+        return 0;
     }
 
     /**

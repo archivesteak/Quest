@@ -25,6 +25,7 @@ public final class Settings {
     // Categories. Their titles are the strings "category_<category>".
     private static final String PIN_PAGE = "pin_page";
     private static final String LONG_PRESS_MENU = "long_press_menu";
+    private static final String SHARING = "sharing";
 
     // region Pin page
 
@@ -40,11 +41,19 @@ public final class Settings {
     // Keys end with the app's name for the menu item.
     public static final BooleanSetting LONG_PRESS_SAVE = new BooleanSetting("long_press_REPIN", true, LONG_PRESS_MENU);
     public static final BooleanSetting LONG_PRESS_SEND = new BooleanSetting("long_press_SEND", true, LONG_PRESS_MENU);
+    // The app's item for sending with the app the Pin was last shared with.
+    public static final BooleanSetting LONG_PRESS_SHARE_APP = new BooleanSetting("long_press_share_app", true, LONG_PRESS_MENU);
     public static final BooleanSetting LONG_PRESS_SEE_MORE = new BooleanSetting("long_press_SEE_MORE", true, LONG_PRESS_MENU);
     public static final BooleanSetting LONG_PRESS_SEE_LESS = new BooleanSetting("long_press_HIDE", true, LONG_PRESS_MENU);
     public static final BooleanSetting LONG_PRESS_VISUAL_SEARCH = new BooleanSetting("long_press_VISUAL_SEARCH", true, LONG_PRESS_MENU);
     public static final BooleanSetting LONG_PRESS_EDIT = new BooleanSetting("long_press_EDIT", true, LONG_PRESS_MENU);
     public static final BooleanSetting LONG_PRESS_REORDER = new BooleanSetting("long_press_REORDER", true, LONG_PRESS_MENU);
+
+    // endregion
+
+    // region Sharing
+
+    public static final BooleanSetting SHARE_WITH_ANDROID = new BooleanSetting("share_with_android", true, SHARING);
 
     // endregion
 

@@ -12,8 +12,12 @@ import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.ClassDef
+import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 private const val EXTENSION_CLASS = "$EXTENSION_PACKAGE/LongPressMenuPatch;"
@@ -41,6 +45,8 @@ val longPressMenuPatch = bytecodePatch(
             "long_press_copy_image_summary" to "Copies the image to the clipboard.",
             "long_press_REPIN_title" to "Save",
             "long_press_SEND_title" to "Send",
+            "long_press_share_app_title" to "Send with app",
+            "long_press_share_app_summary" to "Sends with the app you last shared with.",
             "long_press_SEE_MORE_title" to "See more like this",
             "long_press_HIDE_title" to "See less",
             "long_press_VISUAL_SEARCH_title" to "Search image",
@@ -147,6 +153,17 @@ val longPressMenuPatch = bytecodePatch(
             """
         )
 
+        // Items are tagged with the id of their kind, such as context_share_recent.
+        val itemKindField = classDefBy(MENU_ITEM_VIEW).itemKindField()
+        extensionMethods.single { it.name == "getMenuItemKind" }.addInstructions(
+            0,
+            """
+                check-cast p0, $MENU_ITEM_VIEW
+                iget p0, p0, $MENU_ITEM_VIEW->$itemKindField:I
+                return p0
+            """
+        )
+
         ContextMenuSetItemsFingerprint.method.addInstructions(
             0,
             """
@@ -157,4 +174,24 @@ val longPressMenuPatch = bytecodePatch(
 
         // endregion
     }
+}
+
+/** The field tagging a menu item with its kind, the only number field the item view starts as -1. */
+private fun ClassDef.itemKindField(): String {
+    val fieldNames = methods.filter { it.name == "<init>" }.flatMap { constructor ->
+        val instructions = constructor.implementation?.instructions?.toList().orEmpty()
+        instructions.withIndex().mapNotNull { (index, instruction) ->
+            if (instruction.opcode != Opcode.IPUT) return@mapNotNull null
+
+            val field = (instruction as ReferenceInstruction).reference as FieldReference
+            val valueRegister = (instruction as TwoRegisterInstruction).registerA
+            val value = instructions.subList(0, index).lastOrNull {
+                it is NarrowLiteralInstruction && (it as OneRegisterInstruction).registerA == valueRegister
+            } as? NarrowLiteralInstruction
+            field.name.takeIf { field.definingClass == type && field.type == "I" && value?.narrowLiteral == -1 }
+        }
+    }.distinct()
+
+    return fieldNames.singleOrNull()
+        ?: throw PatchException("Expected one long-press menu item kind field, found $fieldNames")
 }
