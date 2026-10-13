@@ -1,3 +1,15 @@
+## [1.4.0-dev.1](https://github.com/archivesteak/pinterest-patches/compare/v1.3.0...v1.4.0-dev.1) (2026-10-13)
+
+### 🐛 Bug Fixes
+
+* **Pinterest - Enable video download:** Close the Pin menu after downloading a video ([9d92b42](https://github.com/archivesteak/pinterest-patches/commit/9d92b42579ee98f9f262d99a7b16cc7dcaf8a93d))
+
+### ✨ New Features
+
+* **Pinterest - Customize long-press menu:** Add option to hide the "Send with <app>" item ([3481492](https://github.com/archivesteak/pinterest-patches/commit/348149288ff096a0d2f1d189de7998fb11b6292d))
+* **Pinterest:** Add `Copy image` patch ([7eefde7](https://github.com/archivesteak/pinterest-patches/commit/7eefde7d43286e0a2825db6568d1164b2d4edeb3))
+* **Pinterest:** Add `Share image with Android` patch ([ee0d393](https://github.com/archivesteak/pinterest-patches/commit/ee0d393ac4fde85a94d53656e3a82fb0bf3c7353))
+
 ## [1.3.0](https://github.com/archivesteak/pinterest-patches/compare/v1.2.0...v1.3.0) (2026-10-13)
 
 ### 🐛 Bug Fixes
