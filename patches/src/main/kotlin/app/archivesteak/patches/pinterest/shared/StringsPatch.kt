@@ -1,5 +1,6 @@
 package app.archivesteak.patches.pinterest.shared
 
+import app.archivesteak.patches.shared.escapeForResource
 import app.morphe.patcher.patch.resourcePatch
 
 /** Prefix of the app strings the patches add. The extension uses the same prefix. */
@@ -32,8 +33,3 @@ internal fun stringsPatch(vararg strings: Pair<String, String>) = resourcePatch 
         }
     }
 }
-
-private fun String.escapeForResource() = replace("\\", "\\\\")
-    .replace("'", "\\'")
-    .replace("\"", "\\\"")
-    .replace(Regex("^([@?])"), "\\\\$1")

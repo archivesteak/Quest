@@ -8,14 +8,14 @@ import app.archivesteak.patches.gboard.misc.settings.settingsPatch
 import app.archivesteak.patches.gboard.misc.signature.signatureCheckPatch
 import app.archivesteak.patches.gboard.shared.Constants.COMPATIBILITY_GBOARD
 import app.archivesteak.patches.gboard.shared.EXTENSION_PACKAGE
+import app.archivesteak.patches.gboard.shared.editString
 import app.archivesteak.patches.gboard.shared.hookFlagReads
+import app.archivesteak.patches.gboard.shared.strings
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.patch.resourcePatch
 import app.morphe.patcher.patch.stringOption
-import org.w3c.dom.Document
-import org.w3c.dom.Element
 import java.util.Properties
 
 private const val EXTENSION_CLASS = "$EXTENSION_PACKAGE/KlipyPatch;"
@@ -51,16 +51,7 @@ private val searchHintPatch = resourcePatch {
             document.strings().singleOrNull { it.textContent == "Search Tenor" }?.getAttribute("name")
         } ?: throw PatchException("GIF search hint not found")
 
-        get("res").listFiles { file -> file.isDirectory && file.name.startsWith("values") }!!
-            .map { "res/${it.name}/strings.xml" }
-            .filter { get(it).exists() }
-            .forEach { path ->
-                document(path).use { document ->
-                    document.strings().filter { it.getAttribute("name") == hintName }.forEach {
-                        it.textContent = it.textContent.replace("Tenor", "KLIPY")
-                    }
-                }
-            }
+        editString(hintName) { it.replace("Tenor", "KLIPY") }
     }
 }
 
@@ -117,8 +108,4 @@ val useKlipyPatch = bytecodePatch(
             """
         )
     }
-}
-
-private fun Document.strings() = getElementsByTagName("string").let { nodes ->
-    (0 until nodes.length).map { nodes.item(it) as Element }
 }
