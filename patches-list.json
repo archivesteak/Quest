@@ -1,7 +1,46 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.5.0",
+  "version": "1.6.0-dev.1",
   "patches": [
+    {
+      "name": "Change app name",
+      "description": "Changes the name of the app, so it can be told apart from the preinstalled Gboard.",
+      "default": true,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.google.android.inputmethod.latin",
+          "name": "Gboard",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#4285F4",
+          "signatures": [
+            "f0fd6c5b410f25cb25c3b53346c8972fae30f8ee7411df910480ad6b2d60db83",
+            "7ce83c1b71f3d572fed04c8d40c5cb10ff75e6d87d9df6fbd53f0468c2905053"
+          ],
+          "targets": [
+            {
+              "version": "18.4.1.985164140-release-arm64-v8a",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": [
+        {
+          "key": "appName",
+          "title": "App name",
+          "description": "The name of the app, shown in the app list and the list of keyboards.",
+          "required": true,
+          "type": "kotlin.String",
+          "default": "Gboard Quest",
+          "values": null
+        }
+      ]
+    },
     {
       "name": "Change package name",
       "description": "Changes the package name of the app, so it can be installed next to the preinstalled Gboard.",

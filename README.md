@@ -28,12 +28,13 @@ Supported version: 18.4.1.985164140 (arm64-v8a, nodpi)
 | Remove clipboard length limit | Adds an option to keep copied text of any length in the clipboard, instead of cutting it off after 20,000 characters. |
 | Use KLIPY for GIFs            | Adds an option to get GIFs and stickers from [KLIPY](https://klipy.com) instead of Tenor. |
 | Change package name           | Changes the package name of the app, so it can be installed next to the preinstalled Gboard. |
+| Change app name               | Changes the name of the app, so it can be told apart from the preinstalled Gboard. |
 
 Options are in Gboard's settings, under "Quest". KLIPY works without setup. You can set your own
 KLIPY API key there, or when patching.
 
 Gboard comes preinstalled on many phones, and a patched Gboard can't be installed over it. The patched
-app installs next to it as a separate keyboard. Enable it in Settings > System > Keyboard > On-screen keyboard.
+app installs next to it as a separate keyboard, "Gboard Quest". Enable it in Settings > System > Keyboard > On-screen keyboard.
 
 ## Usage
 
