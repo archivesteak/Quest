@@ -2,12 +2,12 @@ group = "app.archivesteak"
 
 patches {
     about {
-        name = "Pinterest Patches"
-        description = "Patches for Pinterest"
-        source = "git@github.com:archivesteak/pinterest-patches.git"
+        name = "Quest Patches"
+        description = "Patches for Pinterest and Gboard"
+        source = "git@github.com:archivesteak/Quest.git"
         author = "archivesteak"
-        contact = "https://github.com/archivesteak/pinterest-patches/issues"
-        website = "https://github.com/archivesteak/pinterest-patches"
+        contact = "https://github.com/archivesteak/Quest/issues"
+        website = "https://github.com/archivesteak/Quest"
         license = "GPLv3"
     }
 }
@@ -21,7 +21,20 @@ dependencies {
     patchListGeneratorClasspath(libs.gson)
 }
 
+// Quest's KLIPY API key, the default key of "Use KLIPY for GIFs". It's kept out of the repository
+// and set when building, as the klipyApiKey Gradle property or the KLIPY_API_KEY environment variable.
+val klipyApiKey = providers.gradleProperty("klipyApiKey")
+    .orElse(providers.environmentVariable("KLIPY_API_KEY"))
+    .orElse("")
+
 tasks {
+    processResources {
+        inputs.property("klipyApiKey", klipyApiKey)
+        filesMatching("gboard/klipy.properties") {
+            expand("apiKey" to klipyApiKey.get())
+        }
+    }
+
     register<JavaExec>("generatePatchesList") {
         description = "Build patch with patch list"
 

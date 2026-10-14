@@ -1,4 +1,4 @@
-rootProject.name = "pinterest-patches"
+rootProject.name = "Quest"
 
 pluginManagement {
     repositories {
