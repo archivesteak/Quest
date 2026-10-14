@@ -1,3 +1,9 @@
+## [1.6.0-dev.1](https://github.com/archivesteak/Quest/compare/v1.5.0...v1.6.0-dev.1) (2026-10-14)
+
+### ✨ New Features
+
+* **Gboard:** Add `Change app name` patch ([9fe05b0](https://github.com/archivesteak/Quest/commit/9fe05b0c4db6267ad23bb2db82526fd892c2427c))
+
 ## [1.5.0](https://github.com/archivesteak/Quest/compare/v1.4.0...v1.5.0) (2026-10-14)
 
 ### ✨ New Features
