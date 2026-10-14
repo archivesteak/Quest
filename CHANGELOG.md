@@ -1,3 +1,9 @@
+## [1.5.0](https://github.com/archivesteak/Quest/compare/v1.4.0...v1.5.0) (2026-10-14)
+
+### ✨ New Features
+
+* **Gboard:** Add `Remove clipboard length limit`, `Use KLIPY for GIFs` and `Change package name` patches ([3cc836e](https://github.com/archivesteak/Quest/commit/3cc836e34ec251f74ee691f4d02e240acbaa0a19))
+
 ## [1.5.0-dev.1](https://github.com/archivesteak/Quest/compare/v1.4.0...v1.5.0-dev.1) (2026-10-14)
 
 ### ✨ New Features
