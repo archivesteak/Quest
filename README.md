@@ -2,8 +2,6 @@
 
 Patches for Pinterest and Gboard, for use with [Morphe](https://morphe.software).
 
-Named after a VR headset, like [Piko](https://github.com/crimera/piko).
-
 ## Patches
 
 ### Pinterest
