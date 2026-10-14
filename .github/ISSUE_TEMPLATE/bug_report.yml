@@ -6,11 +6,20 @@ body:
   - type: markdown
     attributes:
       value: |
-        # Pinterest Patches bug report
+        # Quest bug report
 
         Before creating a new bug report, please keep the following in mind:
 
-        - **Do not submit a duplicate bug report**: Search for existing bug reports [here](https://github.com/archivesteak/pinterest-patches/issues?q=label%3A%22Bug+report%22).
+        - **Do not submit a duplicate bug report**: Search for existing bug reports [here](https://github.com/archivesteak/Quest/issues?q=label%3A%22Bug+report%22).
+  - type: dropdown
+    id: app
+    attributes:
+      label: App
+      options:
+        - Pinterest
+        - Gboard
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Bug description
